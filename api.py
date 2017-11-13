@@ -2,17 +2,27 @@ from flask import Flask, jsonify, make_response
 
 app = Flask(__name__);
 
-app.CARS = []
+app.CARS = ['car1', 'car2']
+
 
 class CarModel:
+
     @staticmethod
-    def list(self):
+    def list():
         return app.CARS
-    def get(self,car_id):
+
+    @staticmethod
+    def get(id):
+        try:
+            result = app.CARS[id - 1]
+        except IndexError:
+            result = False
+        return result;
+
+    def save(self, car):
         pass
-    def save(self,car):
-        pass
-    def remove(self,id):
+
+    def remove(self, id):
         pass
 
 
@@ -24,7 +34,10 @@ def get_cars():
 
 @app.route("/cars/<int:id>", methods=['GET'])
 def get_car(id):
-    pass
+    car = CarModel.get(id)
+    if not car:
+        return make_response(jsonify({'error':'not found'}), 404)
+    return make_response(jsonify(car), 200)
 
 
 @app.route("/cars/<int:id>", methods=['POST'])
