@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, make_response
-
+from flask import Flask, jsonify, make_response, request
+import json
 app = Flask(__name__);
 
 app.CARS = ['car1', 'car2']
@@ -17,12 +17,13 @@ class CarModel:
             result = app.CARS[id - 1]
         except IndexError:
             result = False
-        return result;
+        return result
 
-    def save(self, car):
+    @staticmethod
+    def save(car):
         pass
-
-    def remove(self, id):
+    @staticmethod
+    def remove(id):
         pass
 
 
@@ -40,9 +41,14 @@ def get_car(id):
     return make_response(jsonify(car), 200)
 
 
-@app.route("/cars/<int:id>", methods=['POST'])
+@app.route("/cars", methods=['POST'])
 def create_car():
-    pass
+    request_body = request.data.decode("utf-8");
+    data = json.loads(request_body);
+    result = CarModel.save(data);
+    if "errors" in result:
+        return make_response(jsonify({'errors': result["errors"]}), 422)
+    return make_response(jsonify(data), 201)
 
 
 @app.route("/cars/<int:id>", methods=['PUT'])
@@ -50,7 +56,7 @@ def update_car():
     pass
 
 
-@app.route("/cars", methods=['DELETE'])
+@app.route("/cars/<int:id>", methods=['DELETE'])
 def remove_car():
     pass
 
