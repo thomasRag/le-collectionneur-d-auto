@@ -2,13 +2,18 @@ from flask import Flask, jsonify, make_response
 
 app = Flask(__name__);
 
-CARS = []
+app.CARS = []
 
 class CarModel:
     @staticmethod
     def list(self):
-        mycars = CARS
-        return mycars
+        return app.CARS
+    def get(self,car_id):
+        pass
+    def save(self,car):
+        pass
+    def remove(self,id):
+        pass
 
 
 @app.route("/cars", methods=['GET'])
