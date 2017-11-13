@@ -57,6 +57,7 @@ class RoutesTestCase(unittest.TestCase):
 
     @patch('api.CarModel.save')
     def test_create_car(self, mock_car_save):
+
         mock_car_save.return_value = {'test'}
         response = app.test_client(self).post('/cars', data='{"key":"value"}')
         self.assertEqual(response.status_code, 201)
