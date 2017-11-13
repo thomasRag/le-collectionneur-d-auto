@@ -3,7 +3,7 @@ import json
 from api import app
 from unittest.mock import patch
 
-class GetTestCase(unittest.TestCase):
+class RoutesTestCase(unittest.TestCase):
 
     """
     test get_cars method:
