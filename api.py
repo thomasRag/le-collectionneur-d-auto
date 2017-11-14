@@ -45,16 +45,14 @@ class CarValidator:
             }
 
         v = Validator(self.schema)
-        try:
-            self.is_valid = v.validate(car_object);
-        except Exception:
-            print(Exception)
+        self.is_valid = v.validate(car_object);
         if not self.is_valid:
             self.errors = v._errors
         else:
             self.errors = None
     def get_is_valid(self):
         return self.is_valid
+
 class CarModel:
 
     @staticmethod
@@ -63,29 +61,46 @@ class CarModel:
 
     @staticmethod
     def get(id):
+        items = list(filter(lambda x: x['id'] == id, app.CARS))
         try:
-            result = app.CARS[id - 1]
+            result = items.pop()
         except IndexError:
             result = False
         return result
 
     @staticmethod
-    def save(car):
+    def save(car, id = False):
         validator = CarValidator(car)
         if not validator.get_is_valid():
             return {'errors': ['unprocessable entity']}
-        existing_ids =  [CAR['id'] for CAR in app.CARS]
-        if existing_ids:
-            new_id = max(existing_ids) + 1
-        else:
-            new_id = 1
-        car['id'] = new_id
+        if not id:
+            existing_ids =  [CAR['id'] for CAR in app.CARS]
+            if existing_ids:
+                id = max(existing_ids) + 1
+            else:
+                id = 1
+        car['id'] = id
         app.CARS.append(car)
         return car
 
     @staticmethod
-    def remove(id):
-        pass
+    def update(id, car):
+        old_car = CarModel.get(id)
+        if old_car == False:
+            return False
+        CarModel.delete(id)
+        return CarModel.save(car, id)
+
+    @staticmethod
+    def delete(id):
+        if not CarModel.get(id):
+            return False
+        def has_id(item_tuple, id):
+            [index, item] = item_tuple
+            return item['id'] == id
+        [index, item] = next(filter(lambda CAR: has_id(CAR, id), enumerate(app.CARS)))
+        del app.CARS[index]
+        return True
 
 
 
@@ -110,12 +125,19 @@ def create_car():
     result = CarModel.save(data)
     if "errors" in result:
         return make_response(jsonify({'errors': result["errors"]}), 422)
-    return make_response(jsonify(data), 201)
+    return make_response(jsonify(result), 201)
 
 
 @app.route("/cars/<int:id>", methods=['PUT'])
-def update_car():
-    pass
+def update_car(id):
+    request_body = request.data.decode("utf-8")
+    data = json.loads(request_body)
+    result = CarModel.update(id, data)
+    if not result:
+        return make_response(jsonify({'error':'not found'}), 404)
+    if "errors" in result:
+        return make_response(jsonify({'errors': result["errors"]}), 422)
+    return make_response(jsonify(result), 200)
 
 
 @app.route("/cars/<int:id>", methods=['DELETE'])

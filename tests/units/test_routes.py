@@ -58,13 +58,34 @@ class RoutesTestCase(unittest.TestCase):
     @patch('api.CarModel.save')
     def test_create_car(self, mock_car_save):
 
-        mock_car_save.return_value = {'test'}
+        mock_car_save.return_value = {"key":"value"}
         response = app.test_client(self).post('/cars', data='{"key":"value"}')
         self.assertEqual(response.status_code, 201)
+        response_string = response.data.decode("utf-8")
+        self.assertEqual(json.loads(response_string), {"key":"value"})
 
         mock_car_save.return_value = {"errors": ["test errors"]}
         response = app.test_client(self).post('/cars', data='{"key":"value"}')
         self.assertEqual(response.status_code, 422)
+
+
+    @patch('api.CarModel.update')
+    def test_update_car(self, mock_car_update):
+        mock_car_update.return_value = {"id": 1, "key":"new_value"}
+
+        response = app.test_client(self).put('/cars/1', data='{"key":"new_value"}')
+        response_string = response.data.decode("utf-8")
+        self.assertEqual(json.loads(response_string), {"id": 1, "key":"new_value"})
+        self.assertEqual(response.status_code, 200)
+
+        mock_car_update.return_value = {"errors": ["test errors"]}
+        response = app.test_client(self).put('/cars/1', data='{"key":"new_value"}')
+        self.assertEqual(response.status_code, 422)
+
+        mock_car_update.return_value = False
+        response = app.test_client(self).put('/cars/1', data='{"key":"new_value"}')
+        self.assertEqual(response.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main()
