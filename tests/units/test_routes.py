@@ -90,7 +90,7 @@ class RoutesTestCase(unittest.TestCase):
         response = app.test_client(self).delete('/cars/1')
         self.assertEqual(response.status_code, 404)
         response_string = response.data.decode("utf-8")
-        self.assertEqual(response_string, '')
+        self.assertEqual(json.loads(response_string), {"error": "not found"})
 
         mock_car_delete.return_value = True
         response = app.test_client(self).delete('/cars/1')

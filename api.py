@@ -141,8 +141,11 @@ def update_car(id):
 
 
 @app.route("/cars/<int:id>", methods=['DELETE'])
-def remove_car():
-    pass
+def remove_car(id):
+    result = CarModel.delete(id)
+    if not result:
+        return make_response(jsonify({'error': 'not found'}), 404)
+    return make_response('', 204)
 
 if __name__ == '__main__':
     app.run(debug=True)
