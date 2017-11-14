@@ -83,7 +83,10 @@ class CarModel:
         if not old_car:
             return False
         CarModel.delete(id)
-        return CarModel.save(car, id)
+        car_saved = CarModel.save(car, id)
+        if not car_saved:
+            car_saved = CarModel.save(old_car, id)
+        return car_saved
 
     @staticmethod
     def delete(id):
