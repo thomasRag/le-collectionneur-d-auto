@@ -1,6 +1,6 @@
+import json
 from flask import Flask, jsonify, make_response, request
 from cerberus import Validator
-import json
 
 app = Flask(__name__)
 
@@ -63,7 +63,7 @@ class CarModel:
         return result
 
     @staticmethod
-    def save(car, id = False):
+    def save(car, id =False):
         validator = CarValidator(car)
         if not validator.get_is_valid():
             return {'errors': ['unprocessable entity']}
