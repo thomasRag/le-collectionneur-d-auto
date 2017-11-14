@@ -6,8 +6,11 @@ app = Flask(__name__)
 
 app.CARS = []
 
+
 class CarValidator:
+
     schema = {}
+
     def __init__(self, car_object):
         if not self.schema:
             self.schema = {
@@ -37,21 +40,12 @@ class CarValidator:
                 }
             }
 
-            self.schema = {
-                "description": {
-                    "type": 'string',
-                    "required": True
-                }
-            }
-
         v = Validator(self.schema)
-        self.is_valid = v.validate(car_object);
-        if not self.is_valid:
-            self.errors = v._errors
-        else:
-            self.errors = None
+        self.is_valid = v.validate(car_object)
+
     def get_is_valid(self):
         return self.is_valid
+
 
 class CarModel:
 
@@ -74,7 +68,7 @@ class CarModel:
         if not validator.get_is_valid():
             return {'errors': ['unprocessable entity']}
         if not id:
-            existing_ids =  [CAR['id'] for CAR in app.CARS]
+            existing_ids = [CAR['id'] for CAR in app.CARS]
             if existing_ids:
                 id = max(existing_ids) + 1
             else:
@@ -86,22 +80,23 @@ class CarModel:
     @staticmethod
     def update(id, car):
         old_car = CarModel.get(id)
-        if old_car == False:
+        if not old_car:
             return False
         CarModel.delete(id)
         return CarModel.save(car, id)
 
     @staticmethod
     def delete(id):
+
+        def has_id(item_tuple, id):
+            return item_tuple[1]['id'] == id
+
         if not CarModel.get(id):
             return False
-        def has_id(item_tuple, id):
-            [index, item] = item_tuple
-            return item['id'] == id
+
         [index, item] = next(filter(lambda CAR: has_id(CAR, id), enumerate(app.CARS)))
         del app.CARS[index]
         return True
-
 
 
 @app.route("/cars", methods=['GET'])
@@ -114,7 +109,7 @@ def get_cars():
 def get_car(id):
     car = CarModel.get(id)
     if not car:
-        return make_response(jsonify({'error':'not found'}), 404)
+        return make_response(jsonify({'error': 'not found'}), 404)
     return make_response(jsonify(car), 200)
 
 
@@ -146,6 +141,7 @@ def remove_car(id):
     if not result:
         return make_response(jsonify({'error': 'not found'}), 404)
     return make_response('', 204)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

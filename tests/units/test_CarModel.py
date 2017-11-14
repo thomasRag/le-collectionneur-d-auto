@@ -1,5 +1,4 @@
 import unittest
-import json
 from api import CarModel
 from api import app
 from api import CarValidator
@@ -18,8 +17,8 @@ class CarModelTestCase(unittest.TestCase):
         self.assertEqual(CarModel.get(4), False)
 
     def test_CarValidator(self):
-        carValidator = CarValidator({'make':3})
-        self.assertFalse(carValidator.is_valid)
+        car_validator = CarValidator({'make':3})
+        self.assertFalse(car_validator.get_is_valid())
 
     @patch('api.CarValidator.get_is_valid')
     def test_save(self, mock_is_valid):
@@ -67,6 +66,7 @@ class CarModelTestCase(unittest.TestCase):
         car = CarModel.update(2, {'key': 'new_value'})
         self.assertEqual(False, car)
         self.assertEqual(app.CARS, [{'id': 1, 'key': 'old_value'}])
+
 
 if __name__ == '__main__':
     unittest.main()
