@@ -1,3 +1,2 @@
-flask
-flask_restful
-pytest
+flask==0.12.2
+cerberus==1.1
