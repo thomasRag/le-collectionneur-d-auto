@@ -19,6 +19,17 @@ class CarModelTestCase(unittest.TestCase):
     def test_CarValidator(self):
         car_validator = CarValidator({'make':3})
         self.assertFalse(car_validator.get_is_valid())
+        valid_object = {
+            "description": "Cadillac 355 D Series 30 (Flat Windshield)",
+            "make": "Cadillac",
+            "displacement": 353.5,
+            "year": 1934,
+            "owner": "John Smith",
+            "media": "https://en.wikipedia.org/wiki/Cadillac_Series_355#/media/File:1934_Cadillac_355D_-_fvr_(4608933837).jpg"
+        }
+
+        car_validator = CarValidator(valid_object)
+        self.assertTrue(car_validator.get_is_valid())
 
     @patch('api.CarValidator.get_is_valid')
     def test_save(self, mock_is_valid):
